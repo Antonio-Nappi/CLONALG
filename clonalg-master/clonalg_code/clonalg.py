@@ -1,7 +1,7 @@
 import numpy as np
 from numpy.random import uniform
 
-def affinity(p_i):
+def affinity(p_i, ap_rad, ap_cost, ds):
     """
     Description
     -----------
@@ -18,7 +18,13 @@ def affinity(p_i):
         Affinity of the subject passed as parameter.
     
     """
-    return np.sum(np.power(p_i, 2))
+
+    n_clients = 0
+    for client in ds:
+        if (is_inside(p_i[0], p_i[1], ap_rad, client[0], client[1])):
+            n_clients += 1
+
+    return ap_cost - n_clients  # wires missing
 
 def create_random_cells(population_size, problem_size, b_lo, b_up):
     population = [uniform(low=b_lo, high=b_up, size=problem_size) for x in range(population_size)]
@@ -56,3 +62,10 @@ def replace(population, population_rand, population_size):
     population = sorted(population, key=lambda x: x[1])[:population_size]
     
     return population
+
+def is_inside(cx, cy, rad, x, y):
+    # Compare radius of circle with distance of its center from given point
+    if ((x - cx) * (x - cx) + (y - cy) * (y - cy) <= rad * rad):
+        return True
+    else:
+        return False

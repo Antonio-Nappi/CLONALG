@@ -6,6 +6,7 @@ import re
 from clonalg_code import clonalg
 from pprint import pprint
 
+# Dataset scattering
 with open("Dataset 1 Wireless Access Point.txt", "r") as f1, open("Dataset 2 Wireless Access Point.txt", "r") as f2:
     x1, y1, x2, y2 = [], [], [], []
     for row in f1:
@@ -16,19 +17,30 @@ with open("Dataset 1 Wireless Access Point.txt", "r") as f1, open("Dataset 2 Wir
         r = re.split(" +", row)
         x2.append(float(r[1]))
         y2.append(float(r[2]))
-    plt.scatter(x1, y1, c="red")
-    plt.scatter(x2, y2, c="blue")
-    plt.show()
+    # plt.scatter(x1, y1, c="red")
+    # plt.show()
+    # plt.scatter(x2, y2, c="blue")
+    # plt.show()
+
+# Dataset building
+ds1 = np.vstack((x1, y1)).T
+ds2 = np.vstack((x2, y2)).T
+
+# Access points features
+ap_range = 50
+ap_cost = 1
+wire_unit_cost = 1
 
 # Inputs parameters
-b_lo, b_up = (-5, 5)
-
-population_size = 100
-selection_size = 10
+b_lo, b_up = (-500, 500)
+population_size = 128
 problem_size = 2
+
+selection_size = 10
 random_cells_num = 20
 clone_rate = 20
 mutation_rate = 0.2
+
 stop_condition = 1000
 
 stop = 0
