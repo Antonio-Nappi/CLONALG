@@ -1,7 +1,7 @@
 import numpy as np
 from numpy.random import uniform
 
-def affinity(p_i, ap_rad, ap_cost, ds):
+def affinity(p_i, ap_rad, ap_cost, ds, aps, mst, wire_unit_cost):
     """
     Description
     -----------
@@ -24,7 +24,12 @@ def affinity(p_i, ap_rad, ap_cost, ds):
         if (is_inside(p_i[0], p_i[1], ap_rad, client[0], client[1])):
             n_clients += 1
 
-    return ap_cost - n_clients  # wires missing
+    n_aps = -1
+    for ap in aps:
+        if (is_inside(p_i[0], p_i[1], ap_rad, ap[0], ap[1])):
+            n_aps += 1
+
+    return ap_cost + n_aps + wire_unit_cost*(sum(mst)) - n_clients
 
 def create_random_cells(population_size, problem_size, b_lo, b_up):
     population = [uniform(low=b_lo, high=b_up, size=problem_size) for x in range(population_size)]
