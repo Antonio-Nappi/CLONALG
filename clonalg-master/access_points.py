@@ -37,7 +37,7 @@ P = 1
 
 # Inputs parameters
 b_lo, b_up = (-500, 500)
-population_size = 3
+population_size = 50
 problem_size = 2
 
 selection_size = 1
@@ -45,7 +45,7 @@ random_cells_num = 20
 clone_rate = 20
 mutation_rate = 0.2
 
-stop_condition = 1
+stop_condition = 100
 
 stop = 0
 cln = Clonalg(P,ap_cost,ap_rad,ds1)
@@ -119,11 +119,12 @@ plt.show()
 
 # We get the mean of the best 5 individuals returned by iteration of the above loop
 bests_mean = []
-iterations = [i for i in range(100)]
+iterations = [i for i in range(stop_condition)]
 
 for pop_it in best_affinity_it:
     bests_mean.append(np.mean([p_i[1] for p_i in pop_it]))
-print(len(bests_mean))
+print('bests',len(bests_mean))
+print(bests_mean)
 fig, ax = plt.subplots(1, 1, figsize = (5, 5), dpi=150)
 print(iterations)
 sns.set_style("darkgrid")
