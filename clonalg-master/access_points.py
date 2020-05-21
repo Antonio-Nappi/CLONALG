@@ -37,7 +37,7 @@ P = 1
 
 # Inputs parameters
 b_lo, b_up = (-500, 500)
-population_size = 128
+population_size = 40
 problem_size = 2
 
 selection_size = 1
@@ -45,15 +45,16 @@ random_cells_num = 20
 clone_rate = 20
 mutation_rate = 0.2
 
-stop_condition = 1000
+stop_condition = 100
 
 stop = 0
-graph = []
 
 # Population <- CreateRandomCells(Population_size, Problem_size)
 population = clonalg.create_random_cells(population_size, problem_size, b_lo, b_up)
 
 # Graph and MST
+graph = []
+
 for antibody in population:
     graph.append([wire_unit_cost*distance.euclidean(antibody,other) for other in population])
 
@@ -92,8 +93,7 @@ while stop != stop_condition:
     population = clonalg.select(population_affinity, population_clones, population_size)
     # Population_rand <- CreateRandomCells(RandomCells_num)
     population_rand = clonalg.create_random_cells(random_cells_num, problem_size, b_lo, b_up)
-    population_rand_affinity = [(p_i, clonalg.affinity(p_i, ap_rad, ap_cost, ds1, population, np.array([mst[i,:], mst[:,i]]), P))
-                                for i, p_i in enumerate(population_rand)]
+    population_rand_affinity = [(p_i, clonalg.affinity(p_i, ap_rad, ap_cost, ds1, population, np.array([mst[i,:], mst[:,i]]), P)) for i, p_i in enumerate(population_rand)]
     population_rand_affinity = sorted(population_rand_affinity, key=lambda x: x[1])
     # Replace(Population, Population_rand)
     population = clonalg.replace(population_affinity, population_rand_affinity, population_size)
@@ -101,6 +101,18 @@ while stop != stop_condition:
 
     stop += 1
     print(stop)
+
+plt.grid(color='black', linestyle='-', linewidth=0.5, alpha=0.2)
+plt.xticks(np.arange(-500, 500, 50))
+plt.yticks(np.arange(-500, 500, 50))
+plt.scatter(x1, y1, c="red")
+fig = plt.gcf()
+ax = fig.gca()
+for p_i in population:
+    ax.add_artist(plt.Circle((p_i[0], p_i[1]), ap_rad, facecolor='none', edgecolor='blue'))
+#plt.scatter([p_i[0] for p_i in population], [p_i[1] for p_i in population], s=ap_rad*ap_rad*np.pi/4, facecolors='none', edgecolors='blue')
+plt.gca().set_aspect('equal', adjustable='box')
+plt.show()
 
 # We get the mean of the best 5 individuals returned by iteration of the above loop
 bests_mean = []

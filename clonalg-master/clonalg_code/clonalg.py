@@ -20,14 +20,12 @@ def affinity(p_i, ap_rad, ap_cost, ds, aps, mst, P):
     
     """
 
-    print("aps")
     n_aps = 0
     for ap in aps:
         inside, _ = is_inside(p_i, 2 * ap_rad, ap)
         if inside:
             n_aps += 1
 
-    print("clients")
     n_clients = 0
     sig = 0
     for client in ds:
@@ -43,6 +41,10 @@ def affinity(p_i, ap_rad, ap_cost, ds, aps, mst, P):
 
 
 def is_inside(ap, rad, other):
+    if type(ap) is tuple:
+        ap = ap[0]
+    if type(other) is tuple:
+        other = other[0]
     # Compare radius of circle with distance of its center from given point
     # print('ap0', ap[0], 'ap1', ap[1])
     # print('other0', other[0], 'other1', other[1])
