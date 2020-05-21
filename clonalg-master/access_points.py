@@ -30,13 +30,14 @@ ds1 = np.vstack((x1, y1)).T
 ds2 = np.vstack((x2, y2)).T
 
 # Access points features
-ap_range = 50
+ap_rad = 50
 ap_cost = 1
 wire_unit_cost = 10
+P = 1
 
 # Inputs parameters
 b_lo, b_up = (-500, 500)
-population_size = 5
+population_size = 128
 problem_size = 2
 
 selection_size = 1
@@ -52,6 +53,7 @@ graph = []
 # Population <- CreateRandomCells(Population_size, Problem_size)
 population = clonalg.create_random_cells(population_size, problem_size, b_lo, b_up)
 
+# Graph and MST
 for antibody in population:
     graph.append([wire_unit_cost*distance.euclidean(antibody,other) for other in population])
 
@@ -63,7 +65,8 @@ best_affinity_it = []
 
 while stop != stop_condition:
     # Affinity(p_i)
-    population_affinity = [(p_i, clonalg.affinity(p_i)) for p_i in population]
+    population_affinity = [(p_i, clonalg.affinity(p_i, ap_rad, ap_cost, ds1, population, np.array([mst[i,:], mst[:,i]]), P))
+                           for i, p_i in enumerate(population)]
     population_affinity = sorted(population_affinity, key=lambda x: x[1])
 
     best_affinity_it.append(population_affinity[:5])
@@ -89,7 +92,8 @@ while stop != stop_condition:
     population = clonalg.select(population_affinity, population_clones, population_size)
     # Population_rand <- CreateRandomCells(RandomCells_num)
     population_rand = clonalg.create_random_cells(random_cells_num, problem_size, b_lo, b_up)
-    population_rand_affinity = [(p_i, clonalg.affinity(p_i)) for p_i in population_rand]
+    population_rand_affinity = [(p_i, clonalg.affinity(p_i, ap_rad, ap_cost, ds1, population, np.array([mst[i,:], mst[:,i]]), P))
+                                for i, p_i in enumerate(population_rand)]
     population_rand_affinity = sorted(population_rand_affinity, key=lambda x: x[1])
     # Replace(Population, Population_rand)
     population = clonalg.replace(population_affinity, population_rand_affinity, population_size)
