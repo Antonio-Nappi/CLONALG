@@ -6,7 +6,7 @@ from scipy.sparse import csr_matrix
 from scipy.sparse.csgraph import minimum_spanning_tree
 from scipy.spatial import distance
 
-from clonalg_code import clonalg
+from clonalg_code.clonalg import Clonalg
 from pprint import pprint
 
 # Dataset scattering
@@ -31,13 +31,13 @@ ds2 = np.vstack((x2, y2)).T
 
 # Access points features
 ap_rad = 50
-ap_cost = 1
+ap_cost = 200
 wire_unit_cost = 10
 P = 1
 
 # Inputs parameters
 b_lo, b_up = (-500, 500)
-population_size = 40
+population_size = 3
 problem_size = 2
 
 selection_size = 1
@@ -45,12 +45,12 @@ random_cells_num = 20
 clone_rate = 20
 mutation_rate = 0.2
 
-stop_condition = 100
+stop_condition = 1
 
 stop = 0
-
+cln = Clonalg(P,ap_cost,ap_rad,ds1)
 # Population <- CreateRandomCells(Population_size, Problem_size)
-population = clonalg.create_random_cells(population_size, problem_size, b_lo, b_up)
+population = cln.create_random_cells(population_size, problem_size, b_lo, b_up)
 
 # Graph and MST
 graph = []
@@ -61,13 +61,14 @@ for antibody in population:
 graph = np.triu(graph)
 graph = csr_matrix(graph)
 mst = minimum_spanning_tree(graph).toarray()
-
+cln.set_aps(population)
+cln.set_mst(mst)
 best_affinity_it = []
 
 while stop != stop_condition:
     # Affinity(p_i)
-    population_affinity = [(p_i, clonalg.affinity(p_i, ap_rad, ap_cost, ds1, population, np.array([mst[i,:], mst[:,i]]), P))
-                           for i, p_i in enumerate(population)]
+
+    population_affinity = [(p_i, cln.affinity(p_i)) for i, p_i in enumerate(population)]
     population_affinity = sorted(population_affinity, key=lambda x: x[1])
 
     best_affinity_it.append(population_affinity[:5])
@@ -78,27 +79,29 @@ while stop != stop_condition:
     # Population_clones <- clone(p_i, Clone_rate)
     population_clones = []
     for p_i in population_select:
-        p_i_clones = clonalg.clone(p_i, clone_rate)
+        p_i_clones = cln.clone(p_i, clone_rate)
         population_clones += p_i_clones
 
     # Hypermutate and affinity
     pop_clones_tmp = []
     for p_i in population_clones:
-        ind_tmp = clonalg.hypermutate(p_i, mutation_rate, b_lo, b_up)
+        ind_tmp = cln.hypermutate(p_i, mutation_rate, b_lo, b_up)
         pop_clones_tmp.append(ind_tmp)
     population_clones = pop_clones_tmp
     del pop_clones_tmp
 
     # Population <- Select(Population, Population_clones, Population_size)
-    population = clonalg.select(population_affinity, population_clones, population_size)
+    population = cln.select(population_affinity, population_clones, population_size)
+    cln.set_aps(population)
     # Population_rand <- CreateRandomCells(RandomCells_num)
-    population_rand = clonalg.create_random_cells(random_cells_num, problem_size, b_lo, b_up)
-    population_rand_affinity = [(p_i, clonalg.affinity(p_i, ap_rad, ap_cost, ds1, population, np.array([mst[i,:], mst[:,i]]), P)) for i, p_i in enumerate(population_rand)]
+    population_rand = cln.create_random_cells(random_cells_num, problem_size, b_lo, b_up)
+    cln.set_aps(population_rand)
+    population_rand_affinity = [(p_i, cln.affinity(p_i)) for i, p_i in enumerate(population_rand)]
     population_rand_affinity = sorted(population_rand_affinity, key=lambda x: x[1])
     # Replace(Population, Population_rand)
-    population = clonalg.replace(population_affinity, population_rand_affinity, population_size)
+    population = cln.replace(population_affinity, population_rand_affinity, population_size)
     population = [p_i[0] for p_i in population]
-
+    cln.set_aps(population)
     stop += 1
     print(stop)
 
@@ -116,13 +119,13 @@ plt.show()
 
 # We get the mean of the best 5 individuals returned by iteration of the above loop
 bests_mean = []
-iterations = [i for i in range(1000)]
+iterations = [i for i in range(100)]
 
 for pop_it in best_affinity_it:
     bests_mean.append(np.mean([p_i[1] for p_i in pop_it]))
-
+print(len(bests_mean))
 fig, ax = plt.subplots(1, 1, figsize = (5, 5), dpi=150)
-
+print(iterations)
 sns.set_style("darkgrid")
 sns.pointplot(x=iterations, y=bests_mean)
 
