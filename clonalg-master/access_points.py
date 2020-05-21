@@ -32,7 +32,7 @@ ds2 = np.vstack((x2, y2)).T
 # Access points features
 ap_range = 50
 ap_cost = 1
-wire_unit_cost = 1
+wire_unit_cost = 10
 
 # Inputs parameters
 b_lo, b_up = (-500, 500)
@@ -53,7 +53,7 @@ graph = []
 population = clonalg.create_random_cells(population_size, problem_size, b_lo, b_up)
 
 for antibody in population:
-    graph.append([distance.euclidean(antibody,other) for other in population])
+    graph.append([wire_unit_cost*distance.euclidean(antibody,other) for other in population])
 
 graph = np.triu(graph)
 graph = csr_matrix(graph)
