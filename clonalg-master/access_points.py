@@ -2,6 +2,9 @@ import matplotlib.pyplot as plt
 import seaborn as sns
 import numpy as np
 import re
+from scipy.sparse import csr_matrix
+from scipy.sparse.csgraph import minimum_spanning_tree
+from scipy.spatial import distance
 
 from clonalg_code import clonalg
 from pprint import pprint
@@ -33,10 +36,10 @@ wire_unit_cost = 1
 
 # Inputs parameters
 b_lo, b_up = (-500, 500)
-population_size = 128
+population_size = 5
 problem_size = 2
 
-selection_size = 10
+selection_size = 1
 random_cells_num = 20
 clone_rate = 20
 mutation_rate = 0.2
@@ -44,9 +47,18 @@ mutation_rate = 0.2
 stop_condition = 1000
 
 stop = 0
+graph = []
 
 # Population <- CreateRandomCells(Population_size, Problem_size)
 population = clonalg.create_random_cells(population_size, problem_size, b_lo, b_up)
+
+for antibody in population:
+    graph.append([distance.euclidean(antibody,other) for other in population])
+
+graph = np.triu(graph)
+graph = csr_matrix(graph)
+mst = minimum_spanning_tree(graph).toarray()
+
 best_affinity_it = []
 
 while stop != stop_condition:
