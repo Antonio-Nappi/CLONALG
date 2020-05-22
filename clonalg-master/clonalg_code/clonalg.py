@@ -69,7 +69,7 @@ class Clonalg:
             # aff = ((n_aps/len(self._aps)) * (mst_p_i.sum()/self._mst.sum())) / (100*n_clients/(len(self._ds)))  # +
             # sig / n_clients
             aff = self._k_cost * ((intersect_area - np.pi * (self._ap_rad ** 2)) / (
-                        n_aps * np.pi * (self._ap_rad ** 2)) + n_aps / len(
+                    n_aps * np.pi * (self._ap_rad ** 2)) + n_aps / len(
                 self._aps) + mst_p_i.sum() / self._mst.sum()) - self._k_n_client * n_clients
         return aff
 

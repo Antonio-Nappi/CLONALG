@@ -37,24 +37,24 @@ ds1 = np.vstack((x1, y1)).T
 ds2 = np.vstack((x2, y2)).T
 
 # Access points features
-ap_rad = 50                 # Access point radius
-ap_cost = 200               # Access point cost
-wire_unit_cost = 10         # Wire unit cost
-P = 1                       # Access point signal power
-k_cost = 100                # General cost penalty
-k_n_client = 0.5            # Client cost bonus
+ap_rad = 50  # Access point radius
+ap_cost = 200  # Access point cost
+wire_unit_cost = 10  # Wire unit cost
+P = 1  # Access point signal power
+k_cost = 100  # General cost penalty
+k_n_client = 0.5  # Client cost bonus
 
 # Inputs parameters
-b_lo, b_up = (-500, 500)    # Dimension limits
-population_size = 50        # Number of antibodies (i.e. APs)
-problem_size = 2            # Space dimensionality
+b_lo, b_up = (-500, 500)  # Dimension limits
+population_size = 50  # Number of antibodies (i.e. APs)
+problem_size = 2  # Space dimensionality
 
 # Hyperparametrs
-selection_size = 10         # Selection size
-random_cells_num = 20       # Number of random antibodies
-clone_rate = 0.0001         # Clone rate
-mutation_rate = 0.2         # Mutation rate
-stop_condition = 2000       # Number of iterations
+selection_size = 10  # Selection size
+random_cells_num = 20  # Number of random antibodies
+clone_rate = 0.0001  # Clone rate
+mutation_rate = 0.2  # Mutation rate
+stop_condition = 2000  # Number of iterations
 
 
 # Function for Minimum Spanning Tree
