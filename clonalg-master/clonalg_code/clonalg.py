@@ -80,7 +80,7 @@ class Clonalg:
 
 
     def clone(self,p_i, clone_rate):
-        clone_num = int(clone_rate / p_i[1])
+        clone_num = int(clone_rate / abs(p_i[1]))
         clones = [(p_i[0], p_i[1]) for x in range(clone_num)]
 
         return clones
@@ -95,9 +95,9 @@ class Clonalg:
                 else:
                     ind_tmp.append(gen)
 
-            return (np.array(ind_tmp), self.affinity(ind_tmp))
+            return np.array(ind_tmp)
         else:
-            return p_i
+            return p_i[0]
 
 
     def select(self,pop, pop_clones, pop_size):

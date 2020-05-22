@@ -5,7 +5,7 @@ import re
 from scipy.sparse import csr_matrix
 from scipy.sparse.csgraph import minimum_spanning_tree
 from scipy.spatial import distance
-
+import time
 from clonalg_code.clonalg import Clonalg
 from pprint import pprint
 
@@ -37,10 +37,10 @@ P = 1
 
 # Inputs parameters
 b_lo, b_up = (-500, 500)
-population_size = 50
+population_size = 40
 problem_size = 2
 
-selection_size = 1
+selection_size = 10
 random_cells_num = 20
 clone_rate = 20
 mutation_rate = 0.2
@@ -49,28 +49,31 @@ stop_condition = 100
 
 stop = 0
 cln = Clonalg(P,ap_cost,ap_rad,ds1)
+
+def compute_mst(population,wire_unit_cost):
+    graph = []
+    for antibody in population:
+        graph.append([wire_unit_cost * distance.euclidean(antibody, other) for other in population])
+
+    graph = np.triu(graph)
+    graph = csr_matrix(graph)
+    mst = minimum_spanning_tree(graph).toarray()
+    return mst
 # Population <- CreateRandomCells(Population_size, Problem_size)
 population = cln.create_random_cells(population_size, problem_size, b_lo, b_up)
 
 # Graph and MST
-graph = []
 
-for antibody in population:
-    graph.append([wire_unit_cost*distance.euclidean(antibody,other) for other in population])
-
-graph = np.triu(graph)
-graph = csr_matrix(graph)
-mst = minimum_spanning_tree(graph).toarray()
 cln.set_aps(population)
-cln.set_mst(mst)
-best_affinity_it = []
 
+cln.set_mst(compute_mst(population,wire_unit_cost))
+
+best_affinity_it = []
+p_time =  time.time()
 while stop != stop_condition:
     # Affinity(p_i)
-
-    population_affinity = [(p_i, cln.affinity(p_i)) for i, p_i in enumerate(population)]
+    population_affinity = [(p_i, cln.affinity(p_i)) for p_i in population]
     population_affinity = sorted(population_affinity, key=lambda x: x[1])
-
     best_affinity_it.append(population_affinity[:5])
 
     # Populatin_select <- Select(Population, Selection_size)
@@ -87,24 +90,32 @@ while stop != stop_condition:
     for p_i in population_clones:
         ind_tmp = cln.hypermutate(p_i, mutation_rate, b_lo, b_up)
         pop_clones_tmp.append(ind_tmp)
-    population_clones = pop_clones_tmp
+    cln.set_aps(pop_clones_tmp)
+
+    cln.set_mst(compute_mst(pop_clones_tmp,wire_unit_cost))
+    population_clones = [(p_i, cln.affinity(p_i)) for p_i in  pop_clones_tmp]
     del pop_clones_tmp
 
     # Population <- Select(Population, Population_clones, Population_size)
     population = cln.select(population_affinity, population_clones, population_size)
     cln.set_aps(population)
+    cln.set_mst(compute_mst(population, wire_unit_cost))
+    population_affinity = [(p_i, cln.affinity(p_i)) for p_i in population]
     # Population_rand <- CreateRandomCells(RandomCells_num)
     population_rand = cln.create_random_cells(random_cells_num, problem_size, b_lo, b_up)
     cln.set_aps(population_rand)
+    cln.set_mst(compute_mst(population_rand,wire_unit_cost))
     population_rand_affinity = [(p_i, cln.affinity(p_i)) for i, p_i in enumerate(population_rand)]
     population_rand_affinity = sorted(population_rand_affinity, key=lambda x: x[1])
     # Replace(Population, Population_rand)
     population = cln.replace(population_affinity, population_rand_affinity, population_size)
     population = [p_i[0] for p_i in population]
     cln.set_aps(population)
+    cln.set_mst(compute_mst(population,wire_unit_cost))
     stop += 1
     print(stop)
-
+e_time = time.time() - p_time
+print(e_time/60)
 plt.grid(color='black', linestyle='-', linewidth=0.5, alpha=0.2)
 plt.xticks(np.arange(-500, 500, 50))
 plt.yticks(np.arange(-500, 500, 50))
@@ -141,3 +152,5 @@ plt.ylabel("Affinity Mean", fontsize=10)
 plt.rc('ytick',labelsize=2)
 plt.xlabel("# Iteration", fontsize=10)
 plt.show()
+
+
