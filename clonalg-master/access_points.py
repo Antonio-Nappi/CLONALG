@@ -37,11 +37,11 @@ P = 1
 
 # Inputs parameters
 b_lo, b_up = (-500, 500)
-population_size = 40
+population_size = 5
 problem_size = 2
 
-selection_size = 10
-random_cells_num = 20
+selection_size = 2
+random_cells_num = 3
 clone_rate = 20
 mutation_rate = 0.2
 
@@ -51,17 +51,18 @@ stop = 0
 cln = Clonalg(P,ap_cost,ap_rad,ds1)
 
 def compute_mst(population,wire_unit_cost):
+    if type(population[0]) is tuple:
+        population = [pi[0] for pi in population]
     graph = []
     for antibody in population:
         graph.append([wire_unit_cost * distance.euclidean(antibody, other) for other in population])
-
     graph = np.triu(graph)
     graph = csr_matrix(graph)
     mst = minimum_spanning_tree(graph).toarray()
     return mst
 # Population <- CreateRandomCells(Population_size, Problem_size)
 population = cln.create_random_cells(population_size, problem_size, b_lo, b_up)
-
+print("Population prima di iniziare",population)
 # Graph and MST
 
 cln.set_aps(population)
@@ -72,7 +73,9 @@ best_affinity_it = []
 p_time =  time.time()
 while stop != stop_condition:
     # Affinity(p_i)
+    print("iterazione",stop)
     population_affinity = [(p_i, cln.affinity(p_i)) for p_i in population]
+    print(population_affinity)
     population_affinity = sorted(population_affinity, key=lambda x: x[1])
     best_affinity_it.append(population_affinity[:5])
 
@@ -84,25 +87,29 @@ while stop != stop_condition:
     for p_i in population_select:
         p_i_clones = cln.clone(p_i, clone_rate)
         population_clones += p_i_clones
-
+    print("population clones",population_clones,"lunghezza pop clones",len(population_clones))
     # Hypermutate and affinity
     pop_clones_tmp = []
     for p_i in population_clones:
         ind_tmp = cln.hypermutate(p_i, mutation_rate, b_lo, b_up)
         pop_clones_tmp.append(ind_tmp)
+    print("population clones mutati", pop_clones_tmp, "lunghezza pop clones", len(pop_clones_tmp))
     cln.set_aps(pop_clones_tmp)
-
     cln.set_mst(compute_mst(pop_clones_tmp,wire_unit_cost))
     population_clones = [(p_i, cln.affinity(p_i)) for p_i in  pop_clones_tmp]
+    print("population clones con affinity", population_clones, "lunghezza pop clones con affinity", len(population_clones))
     del pop_clones_tmp
 
     # Population <- Select(Population, Population_clones, Population_size)
     population = cln.select(population_affinity, population_clones, population_size)
+    population = [pi[0] for pi in population]
+    print("population",population)
     cln.set_aps(population)
     cln.set_mst(compute_mst(population, wire_unit_cost))
     population_affinity = [(p_i, cln.affinity(p_i)) for p_i in population]
     # Population_rand <- CreateRandomCells(RandomCells_num)
     population_rand = cln.create_random_cells(random_cells_num, problem_size, b_lo, b_up)
+    print("population rand", population_rand)
     cln.set_aps(population_rand)
     cln.set_mst(compute_mst(population_rand,wire_unit_cost))
     population_rand_affinity = [(p_i, cln.affinity(p_i)) for i, p_i in enumerate(population_rand)]
@@ -110,6 +117,7 @@ while stop != stop_condition:
     # Replace(Population, Population_rand)
     population = cln.replace(population_affinity, population_rand_affinity, population_size)
     population = [p_i[0] for p_i in population]
+    print("population", population)
     cln.set_aps(population)
     cln.set_mst(compute_mst(population,wire_unit_cost))
     stop += 1
