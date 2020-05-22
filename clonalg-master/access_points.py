@@ -60,6 +60,7 @@ def compute_mst(population,wire_unit_cost):
     graph = csr_matrix(graph)
     mst = minimum_spanning_tree(graph).toarray()
     return mst
+
 # Population <- CreateRandomCells(Population_size, Problem_size)
 population = cln.create_random_cells(population_size, problem_size, b_lo, b_up)
 print("Population prima di iniziare",population)
@@ -122,6 +123,7 @@ while stop != stop_condition:
     cln.set_mst(compute_mst(population,wire_unit_cost))
     stop += 1
     print(stop)
+
 e_time = time.time() - p_time
 print(e_time/60)
 plt.grid(color='black', linestyle='-', linewidth=0.5, alpha=0.2)
