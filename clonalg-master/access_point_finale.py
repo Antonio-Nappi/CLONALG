@@ -50,11 +50,11 @@ population_size = 50  # Number of antibodies (i.e. APs)
 problem_size = 2  # Space dimensionality
 
 # Hyperparametrs
-selection_size = 10  # Selection size
+selection_size = 25  # Selection size
 random_cells_num = 20  # Number of random antibodies
 clone_rate = 0.0001  # Clone rate
 mutation_rate = 0.2  # Mutation rate
-stop_condition = 2000  # Number of iterations
+stop_condition = 50  # Number of iterations
 
 
 # Function for Minimum Spanning Tree
@@ -97,7 +97,7 @@ while stop != stop_condition:
 
     # - Compute affinity for each antibody of population
     # - Sort by best affinity
-    # - Save best affinities
+    # - Save affinities
     population_affinity = [(p_i, cln.affinity(p_i)) for p_i in population]
     # print("Original Population affinity", population_affinity)
     population_affinity[1:] = sorted(population_affinity[1:], key=lambda x: x[1])
@@ -111,44 +111,45 @@ while stop != stop_condition:
     for p_i in population_select:
         p_i_clones = cln.clone(p_i, clone_rate)
         population_clones += p_i_clones
-    # print("Population clones", population_clones)
-    # print("Length population clones", len(population_clones))
+        # print("Population clones", population_clones)
+        # print("Length population clones", len(population_clones))
 
-    # Hypermutate clones
-    pop_clones_tmp = [population[0]]
-    for p_i in population_clones:
-        ind_tmp = cln.hypermutate(p_i, mutation_rate, b_lo, b_up)
-        pop_clones_tmp.append(ind_tmp)
-    # print("Population of mutated clones", pop_clones_tmp)
-    # print("Length population of mutated clones", len(pop_clones_tmp))
+        # Hypermutate clones
+        pop_clones_tmp = [population[0]]
+        for p_i in population_clones:
+            ind_tmp = cln.hypermutate(p_i, mutation_rate, b_lo, b_up)
+            pop_clones_tmp.append(ind_tmp)
+        # print("Population of mutated clones", pop_clones_tmp)
+        # print("Length population of mutated clones", len(pop_clones_tmp))
 
-    # Compute affinity for each antibody of clones population
-    cln.set_aps(pop_clones_tmp)
-    cln.set_mst(compute_mst(pop_clones_tmp, wire_unit_cost))
-    population_clones_affinity = [(p_i, cln.affinity(p_i)) for p_i in pop_clones_tmp]
-    # print("Population clones with affinity", population_clones)
-    # print("Length population clones with affinity", len(population_clones))
-    del pop_clones_tmp
+        # Compute affinity for each antibody of clones population
+        cln.set_aps(pop_clones_tmp)
+        cln.set_mst(compute_mst(pop_clones_tmp, wire_unit_cost))
+        population_clones_affinity = [(p_i, cln.affinity(p_i)) for p_i in pop_clones_tmp]
+        # print("Population clones with affinity", population_clones)
+        # print("Length population clones with affinity", len(population_clones))
+        del pop_clones_tmp
 
-    # Select a set of best antibodies between initial population and clones with original size
-    population_org_clones_affinity = [population_affinity[0]]
-    population_org_clones_affinity.extend(
-        cln.select(population_affinity[1:], population_clones_affinity, population_size - 1))
+        # Select a set of best antibodies between initial population and clones with original size
+        population_org_clones_affinity = [population_affinity[0]]
+        population_org_clones_affinity.extend(
+            cln.select(population_affinity[1:], population_clones_affinity, population_size - 1))
 
-    # Create random antibodies
-    population_rand = [population[0]]
-    population_rand.extend(cln.create_random_cells(random_cells_num - 1, problem_size, b_lo, b_up))
-    cln.set_aps(population_rand)
-    cln.set_mst(compute_mst(population_rand, wire_unit_cost))
-    population_rand_affinity = [(p_i, cln.affinity(p_i)) for p_i in population_rand]
-    population_rand_affinity[1:] = sorted(population_rand_affinity[1:], key=lambda x: x[1])
+        # Create random antibodies
+        population_rand = [population[0]]
+        population_rand.extend(cln.create_random_cells(random_cells_num - 1, problem_size, b_lo, b_up))
+        cln.set_aps(population_rand)
+        cln.set_mst(compute_mst(population_rand, wire_unit_cost))
+        population_rand_affinity = [(p_i, cln.affinity(p_i)) for p_i in population_rand]
+        population_rand_affinity[1:] = sorted(population_rand_affinity[1:], key=lambda x: x[1])
 
-    # Select a set of best antibodies between population with clones and random antibodies with original size
-    population[1:] = cln.replace(population_org_clones_affinity[1:], population_rand_affinity[1:], population_size - 1)
-    population[1:] = [p_i[0] for p_i in population[1:]]
-    # print("Final population", population)
-    cln.set_aps(population)
-    cln.set_mst(compute_mst(population, wire_unit_cost))
+        # Select a set of best antibodies between population with clones and random antibodies with original size
+        population[1:] = cln.replace(population_org_clones_affinity[1:], population_rand_affinity[1:],
+                                     population_size - 1)
+        population[1:] = [p_i[0] for p_i in population[1:]]
+        # print("Final population", population)
+        cln.set_aps(population)
+        cln.set_mst(compute_mst(population, wire_unit_cost))
 
     # print("End iteration", stop)
     stop += 1
