@@ -75,7 +75,7 @@ def compute_mst(population, wire_unit_cost):
 cln = Clonalg(P=P, ap_cost=ap_cost, ap_rad=ap_rad, ds=ds1, k_cost=k_cost, k_n_client=k_n_client)
 
 # Create source radio station and initial random population
-population = [np.array([0, 0])]  # Source radio station
+population = [np.array([-400, 300])]  # Source radio station
 population.extend(cln.create_random_cells(population_size - 1, problem_size, b_lo, b_up))
 # print("Initial population", population)
 
@@ -159,12 +159,14 @@ print("Elapsed time:", e_time / 60, "minutes")
 # - Scatter clients and APs
 # - Draw APs MST
 plt.grid(color='black', linestyle='-', linewidth=0.5, alpha=0.2)
-plt.xticks(np.arange(-500, 500, 50))
-plt.yticks(np.arange(-500, 500, 50))
+plt.xticks(np.arange(-500, 500, 100))
+plt.yticks(np.arange(-500, 500, 100))
 plt.scatter(x1, y1, c="red")
-plt.scatter(population[0][0], population[0][1], c="green")
+# plt.scatter(population[0][0], population[0][1], c="green")
+
 fig = plt.gcf()
 ax = fig.gca()
+ax.add_artist(plt.Rectangle((population[0][0], population[0][1]), 40, 40, facecolor='green', edgecolor='green'))
 for p_i in population[1:]:
     ax.add_artist(plt.Circle((p_i[0], p_i[1]), ap_rad, facecolor='none', edgecolor='blue'))
 mst = compute_mst(population, wire_unit_cost)
@@ -185,15 +187,18 @@ for pop_it in best_affinity_it:
 # print(bests_mean)
 fig, ax = plt.subplots(1, 1, figsize=(5, 5), dpi=150)
 # print(iterations)
-sns.set_style("darkgrid")
-sns.pointplot(x=iterations, y=bests_mean)
+# sns.set_style("darkgrid")
+# sns.pointplot(x=iterations, y=bests_mean)
+#
+# plt.tick_params(
+#     axis='x',  # changes apply to the x-axis
+#     which='both',  # both major and minor ticks are affected
+#     bottom=False,  # ticks along the bottom edge are off
+#     top=False,  # ticks along the top edge are off
+#     labelbottom=True)  # labels along the bottom edge are on
 
-plt.tick_params(
-    axis='x',  # changes apply to the x-axis
-    which='both',  # both major and minor ticks are affected
-    bottom=False,  # ticks along the bottom edge are off
-    top=False,  # ticks along the top edge are off
-    labelbottom=False)  # labels along the bottom edge are off
+plt.xticks(np.arange(0, stop_condition, stop_condition / 10))
+plt.plot(iterations, bests_mean)
 plt.title("Mean of Affinities by Iteration", fontsize=12)
 plt.ylabel("Affinity Mean", fontsize=10)
 plt.rc('ytick', labelsize=2)
