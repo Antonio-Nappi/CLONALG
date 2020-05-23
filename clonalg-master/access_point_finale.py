@@ -112,7 +112,7 @@ while stop != stop_condition:
         p_i_clones = cln.clone(p_i, clone_rate)
         population_clones += p_i_clones
         # print("Population clones", population_clones)
-        # print("Length population clones", len(population_clones))
+        print("Length population clones", len(population_clones))
 
         # Hypermutate clones
         pop_clones_tmp = [population[0]]
@@ -199,6 +199,7 @@ fig, ax = plt.subplots(1, 1, figsize=(5, 5), dpi=150)
 #     labelbottom=True)  # labels along the bottom edge are on
 
 plt.xticks(np.arange(0, stop_condition, stop_condition / 10))
+plt.ylim(-10, 50)
 plt.plot(iterations, bests_mean)
 plt.title("Mean of Affinities by Iteration", fontsize=12)
 plt.ylabel("Affinity Mean", fontsize=10)

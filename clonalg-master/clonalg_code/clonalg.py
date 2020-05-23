@@ -103,8 +103,8 @@ class Clonalg:
         clone_num = int(clone_rate / p_i[1])
         if clone_num < 2:
             clone_num = 2
-        elif clone_num > 10:
-            clone_num = 10
+        elif clone_num > 20:
+            clone_num = 20
         clones = [(p_i[0], p_i[1]) for x in range(clone_num)]
 
         return clones
