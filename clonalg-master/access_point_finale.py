@@ -272,10 +272,10 @@ for pop_size in parameters['population_size']:
     plt.plot(iterations, bests_seeds_mean)
     plt.title("Mean of Affinities by Iteration over seeds", fontsize=12)
     plt.ylabel("Affinity Mean", fontsize=10)
-    plt.rc('ytick', labelsize=2)
+    plt.rc('ytick', labelsize=10)
     plt.xlabel("# Iteration", fontsize=10)
-    # plt.show()
     plt.savefig('figures/' + '_popsize_' + str(pop_size) + '.png')
+    # plt.show()
 
     '''
     # Remember best configuration
