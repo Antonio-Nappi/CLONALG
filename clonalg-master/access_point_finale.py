@@ -8,6 +8,7 @@ import time
 import csv
 from clonalg_code.clonalg import Clonalg
 import csv
+
 # Set the seed
 np.random.seed(1234)
 seeds = [np.random.randint(9999) for i in range(100)]
@@ -35,7 +36,7 @@ with open("../Dataset 1 Wireless Access Point.txt", "r") as f1, open("../Dataset
 ds1 = np.vstack((x1, y1)).T
 ds2 = np.vstack((x2, y2)).T
 
-with open('seeds.csv','r') as seedsfile:
+with open('seeds.csv', 'r') as seedsfile:
     line = seedsfile.readline()
     seeds = line.split(',')
     seeds = [int(seed) for seed in seeds]
@@ -102,6 +103,13 @@ best_affinity_it = []
 # Initialize time counter
 p_time = time.time()
 
+# Best configuration
+best_config = {
+    'iteration': -1,
+    'affinity': np.inf,
+    'aps': []
+}
+
 # Start iterations
 stop = 0
 
@@ -115,6 +123,12 @@ while stop != stop_condition:
     # print("Original Population affinity", population_affinity)
     population_affinity[1:] = sorted(population_affinity[1:], key=lambda x: x[1])
     best_affinity_it.append(population_affinity)
+
+    # Remember best configuration
+    if np.mean(best_affinity_it[stop]) < best_config['affinity']:
+        best_config['iteration'] = stop
+        best_config['affinity'] = np.mean(best_affinity_it[stop])
+        best_config['aps'] = population
 
     # Select the best subset from population
     population_select = population_affinity[1:selection_size + 1]
