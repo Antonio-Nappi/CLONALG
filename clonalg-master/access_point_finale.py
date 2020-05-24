@@ -248,7 +248,7 @@ for pop_size in parameters['population_size']:
 
         with open('results_min_affinity.csv', 'a') as resultsfile:
             resultsfile.write(
-                str(pop_size) + ',' + str(np.min(bests_mean)) + ',' + str(bests_mean.index(np.min(bests_mean))))
+                str(pop_size) + ',' + str(np.min(bests_mean)) + ',' + str(bests_mean.index(np.min(bests_mean))) + '\n')
 
     # Mean plot
     bests_seeds_mean = np.mean(bests_seeds, axis=0)
