@@ -246,7 +246,7 @@ for pop_size in parameters['population_size']:
         # Save affinity plot
         bests_seeds.append(bests_mean)
 
-        with open('results_min_affinity.csv', 'a') as resultsfile:
+        with open('results_min_affinity_' + str(pop_size) + '.csv', 'a') as resultsfile:
             resultsfile.write(
                 str(pop_size) + ',' + str(np.min(bests_mean)) + ',' + str(bests_mean.index(np.min(bests_mean))) + '\n')
 
@@ -274,7 +274,7 @@ for pop_size in parameters['population_size']:
     plt.ylabel("Affinity Mean", fontsize=10)
     plt.rc('ytick', labelsize=2)
     plt.xlabel("# Iteration", fontsize=10)
-    plt.show()
+    # plt.show()
     plt.savefig('figures/' + '_popsize_' + str(pop_size) + '.png')
 
     '''
