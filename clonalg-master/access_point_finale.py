@@ -1,17 +1,16 @@
 import matplotlib.pyplot as plt
-import seaborn as sns
 import numpy as np
-import networkx as nx
 import re
 from scipy.sparse import csr_matrix
 from scipy.sparse.csgraph import minimum_spanning_tree
 from scipy.spatial import distance
 import time
-
+import csv
 from clonalg_code.clonalg import Clonalg
-
+import csv
 # Set the seed
 np.random.seed(1234)
+seeds = [np.random.randint(9999) for i in range(100)]
 
 # Open the dataset
 with open("../Dataset 1 Wireless Access Point.txt", "r") as f1, open("../Dataset 2 Wireless Access Point.txt",
@@ -36,6 +35,20 @@ with open("../Dataset 1 Wireless Access Point.txt", "r") as f1, open("../Dataset
 ds1 = np.vstack((x1, y1)).T
 ds2 = np.vstack((x2, y2)).T
 
+with open('seeds.csv','r') as seedsfile:
+    line = seedsfile.readline()
+    seeds = line.split(',')
+    seeds = [int(seed) for seed in seeds]
+'''
+for seed in seeds:
+    np.random.seed(seed)
+    parameters = {'population_size':[64],
+                  'random_cells_factor':[0.4],
+                  'selection_size_factor':[0.5],
+                  'clone_rate':[100],
+                  'mutation_rate':[0.25],
+                  'stop_condition':[50]}
+                  '''
 # Access points features
 ap_rad = 50  # Access point radius
 ap_cost = 200  # Access point cost
@@ -46,15 +59,15 @@ k_n_client = 0.5  # Client cost bonus
 
 # Inputs parameters
 b_lo, b_up = (-500, 500)  # Dimension limits
-population_size = 50  # Number of antibodies (i.e. APs)
+population_size = 12  # Number of antibodies (i.e. APs)
 problem_size = 2  # Space dimensionality
 
 # Hyperparametrs
-selection_size = 25  # Selection size
-random_cells_num = 20  # Number of random antibodies
-clone_rate = 0.0001  # Clone rate
-mutation_rate = 0.2  # Mutation rate
-stop_condition = 50  # Number of iterations
+selection_size = 4  # Selection size
+random_cells_num = 7  # Number of random antibodies
+clone_rate = 100  # Clone rate
+mutation_rate = 0.8  # Mutation rate
+stop_condition = 100  # Number of iterations
 
 
 # Function for Minimum Spanning Tree
@@ -111,7 +124,7 @@ while stop != stop_condition:
     for p_i in population_select:
         p_i_clones = cln.clone(p_i, clone_rate)
         population_clones += p_i_clones
-        # print("Population clones", population_clones)
+        print("Population clones", population_clones)
         print("Length population clones", len(population_clones))
 
         # Hypermutate clones

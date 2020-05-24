@@ -101,10 +101,8 @@ class Clonalg:
     # - upper bound is used to avoid extremely slow execution time
     def clone(self, p_i, clone_rate):
         clone_num = int(clone_rate / p_i[1])
-        if clone_num < 2:
-            clone_num = 2
-        elif clone_num > 20:
-            clone_num = 20
+        if clone_num > 20:
+            clone_num = 20  
         clones = [(p_i[0], p_i[1]) for x in range(clone_num)]
 
         return clones
