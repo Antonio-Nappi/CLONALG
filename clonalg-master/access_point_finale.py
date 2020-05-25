@@ -52,12 +52,12 @@ with open('seeds.csv', 'r') as seedsfile:
     seeds = line.split(',')
     seeds = [int(seed) for seed in seeds]
 
-parameters = {'population_size': [5],
+parameters = {'population_size': [16, 32, 64],
               'random_cells_factor': 0.4,
               'selection_size_factor': 0.5,
               'clone_rate': 100,
               'mutation_rate': 0.2,
-              'stop_condition': 100}
+              'stop_condition': 50}
 
 # Access points features
 ap_rad = 50  # Access point radius
@@ -258,12 +258,12 @@ for pop_size in parameters['population_size']:
 
         # Save affinity plot
         bests_seeds.append(bests_mean)
-
+        tmp = np.array([elem for elem in bests_mean if elem != np.inf])
         with open('results_min_affinity_' + str(pop_size) + '.csv', 'a') as resultsfile:
             resultsfile.write(
-                str(pop_size) + ',' + str(np.min(bests_mean)) + ',' + str(
-                    bests_mean.index(np.min(bests_mean))) + ',' + str(global_cost_tmp / stop_condition) + ',' + str(
-                    n_clients_set_tmp / stop_condition) + '\n')
+                "{},{},{},{},{},{},{}\n".format(pop_size, np.min(bests_mean), bests_mean.index(np.min(bests_mean)),
+                                                len(tmp), np.mean(tmp), global_cost_tmp / stop_condition,
+                                                n_clients_set_tmp / stop_condition))
 
     # Mean plot
     bests_seeds_mean = np.mean(bests_seeds, axis=0)
