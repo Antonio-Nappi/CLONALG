@@ -265,7 +265,7 @@ for pop_size in parameters['population_size']:
                     bests_mean.index(np.min(bests_mean))) + ',' + str(global_cost_tmp / stop_condition) + ',' + str(
                     n_clients_set_tmp / stop_condition) + '\n')
 
-            # Mean plot
+    # Mean plot
     bests_seeds_mean = np.mean(bests_seeds, axis=0)
 
     # print('bests', len(bests_mean))
