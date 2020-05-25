@@ -52,7 +52,7 @@ with open('seeds.csv', 'r') as seedsfile:
     seeds = line.split(',')
     seeds = [int(seed) for seed in seeds]
 
-parameters = {'population_size': [16, 32, 64, 128],
+parameters = {'population_size': [5],
               'random_cells_factor': 0.4,
               'selection_size_factor': 0.5,
               'clone_rate': 100,
@@ -124,6 +124,10 @@ for pop_size in parameters['population_size']:
         # Start iterations
         stop = 0
 
+        # Global affinity tmp
+        global_cost_tmp = 0
+        n_clients_set_tmp = 0
+
         while stop != stop_condition:
             print("Iteration", stop)
 
@@ -182,7 +186,16 @@ for pop_size in parameters['population_size']:
                 population[1:] = [p_i[0] for p_i in population[1:]]
                 # print("Final population", population)
                 cln.set_aps(population)
-                cln.set_mst(compute_mst(population, wire_unit_cost))
+                mst = compute_mst(population, wire_unit_cost)
+                cln.set_mst(mst)
+
+            global_cost_tmp += pop_size * ap_cost + mst.sum()
+            clients_set_tmp = set()
+            for ap in population:
+                for client in ds1:
+                    if cln.is_inside(ap, ap_rad, client)[0]:
+                        clients_set_tmp.add(tuple(client))
+            n_clients_set_tmp += len(clients_set_tmp)
 
             # print("End iteration", stop)
             stop += 1
@@ -248,9 +261,11 @@ for pop_size in parameters['population_size']:
 
         with open('results_min_affinity_' + str(pop_size) + '.csv', 'a') as resultsfile:
             resultsfile.write(
-                str(pop_size) + ',' + str(np.min(bests_mean)) + ',' + str(bests_mean.index(np.min(bests_mean))) + '\n')
+                str(pop_size) + ',' + str(np.min(bests_mean)) + ',' + str(
+                    bests_mean.index(np.min(bests_mean))) + ',' + str(global_cost_tmp / stop_condition) + ',' + str(
+                    n_clients_set_tmp / stop_condition) + '\n')
 
-    # Mean plot
+            # Mean plot
     bests_seeds_mean = np.mean(bests_seeds, axis=0)
 
     # print('bests', len(bests_mean))
