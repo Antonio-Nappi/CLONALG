@@ -52,7 +52,7 @@ with open('seeds.csv', 'r') as seedsfile:
     seeds = line.split(',')
     seeds = [int(seed) for seed in seeds]
 
-parameters = {'population_size': [16, 32, 64],
+parameters = {'population_size': [64],
               'random_cells_factor': 0.4,
               'selection_size_factor': 0.5,
               'clone_rate': 100,
